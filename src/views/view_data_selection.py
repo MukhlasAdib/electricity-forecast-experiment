@@ -3,10 +3,17 @@ from typing import Dict, List, Optional, Tuple
 import streamlit as st
 
 
+def view_input_kwh() -> float:
+    st.markdown("Specify your electricity rate per kWh (in rupiah)")
+    return st.number_input(
+        label="Price per kWh", min_value=0, label_visibility="collapsed"
+    )
+
+
 def view_year_month_selection(
     available_months: Dict[str, List[str]],
 ) -> Optional[Tuple[str, str]]:
-    st.markdown("### Select year and month")
+    st.markdown("Select year and month")
     col1, col2, _ = st.columns(spec=[0.4, 0.4, 0.2])
     with col1:
         year = st.selectbox(

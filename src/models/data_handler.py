@@ -1,9 +1,9 @@
 import calendar
+import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
-import streamlit as st
 from darts import TimeSeries
 
 
@@ -44,8 +44,9 @@ def extract_daily_data(month_data: pd.DataFrame) -> Tuple[pd.DataFrame, TimeSeri
 
 
 class DataHandler:
-    def __init__(self, data_path: Path) -> None:
+    def __init__(self, data_path: Path, price_per_kwh: float = 0.0) -> None:
         self.data_path = data_path
+        self.price_per_kwh = price_per_kwh
 
         self.data: Optional[pd.DataFrame] = None
         self.year: Optional[int] = None
@@ -56,19 +57,17 @@ class DataHandler:
         self.month_data_daily: Optional[pd.DataFrame] = None
         self.month_series_daily: Optional[TimeSeries] = None
 
-    def load_data(self) -> None:
-        self.read_csv()
+    @property
+    def last_data_datetime(self) -> Optional[datetime.datetime]:
+        if self.data is None:
+            return None
+        return self.data["Datetime"].dt.to_pydatetime().max()
 
-    def read_csv(self) -> None:
-        data = pd.read_csv(self.data_path)
-        data["Power (W)"] = data["Voltage (V)"] * data["Ampere (A)"]
-        data["Datetime"] = pd.to_datetime(data["Timestamp"], format="%Y-%m-%d %H:%M:%S")
-        data.insert(
-            loc=1,
-            column="Minute of day",
-            value=data["Datetime"].apply(lambda x: x.minute + (x.hour * 60)),
-        )
-        self.data = data
+    def load_data(self) -> None:
+        self._read_csv()
+
+    def set_price_per_kwh(self, price: float) -> None:
+        self.price_per_kwh = price
 
     def get_years_and_months(self) -> Dict[str, List[str]]:
         out = {}
@@ -91,6 +90,17 @@ class DataHandler:
         ].copy()
         self._set_month_minutely_data()
         self._set_month_daily_data()
+
+    def _read_csv(self) -> None:
+        data = pd.read_csv(self.data_path)
+        data["Power (W)"] = data["Voltage (V)"] * data["Ampere (A)"]
+        data["Datetime"] = pd.to_datetime(data["Timestamp"], format="%Y-%m-%d %H:%M:%S")
+        data.insert(
+            loc=1,
+            column="Minute of day",
+            value=data["Datetime"].apply(lambda x: x.minute + (x.hour * 60)),
+        )
+        self.data = data
 
     def _set_month_minutely_data(self) -> None:
         if self.month_data is None:
