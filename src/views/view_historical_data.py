@@ -29,9 +29,10 @@ def view_historical_data_selection(series: TimeSeries) -> Tuple[List[str], bool]
             options=[*series.components, "All"],
             placeholder="Select device...",
             label_visibility="collapsed",
+            key="ms_hist",
         )
     with col2:
-        is_daily = st.toggle("Daily")
+        is_daily = st.toggle("Daily", key="tog_hist")
     return selected_devices, is_daily
 
 

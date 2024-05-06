@@ -1,11 +1,14 @@
 import calendar
 import datetime
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import pandas as pd
 from darts import TimeSeries
 
-from src.controller.historical_utils import get_total_usage_per_device
+from src.controller.historical_utils import (
+    get_df_of_historical_data,
+    get_total_usage_per_device,
+)
 from src.models.forecaster import AverageForecaster
 
 
@@ -48,3 +51,17 @@ def calculate_forecasted_total_usage(
 ) -> Tuple[float, float]:
     sum_data = forecast_data.sum(axis=0)
     return sum_data["Usage (kWh)"], sum_data["Price (Rp)"]
+
+
+def combine_past_and_future_data(
+    future_series: TimeSeries, past_series: TimeSeries, selected_device: str
+) -> Optional[pd.DataFrame]:
+    future_df = get_df_of_historical_data(future_series, [selected_device], False)
+    if future_df is None:
+        return None
+    future_df["source"] = "Forecast"
+    past_df = get_df_of_historical_data(past_series, [selected_device], False)
+    if past_df is None:
+        return None
+    past_df["source"] = "Historical"
+    return pd.concat([past_df, future_df], axis=0)

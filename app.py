@@ -10,7 +10,7 @@ def main(args: AppArguments) -> None:
         unsafe_allow_html=True,
     )
     data = control_data_selection(args.data)
-    control_main_data(data)
+    control_main_data(data, args.model)
 
 
 if __name__ == "__main__":
