@@ -10,7 +10,7 @@ def get_df_of_historical_data(
     if len(selected_devices) <= 0:
         return None
     comp_data_list = []
-    if "All (W)" in selected_devices:
+    if "All" in selected_devices:
         comp_data_list.append(
             series.sum(axis=1)
             .pd_dataframe()
@@ -24,7 +24,7 @@ def get_df_of_historical_data(
             .reset_index()
             .rename(columns={n: "Power (W)"})
             for n in selected_devices
-            if n != "All (W)"
+            if n != "All"
         ]
     )
     for d, n in zip(comp_data_list, selected_devices):

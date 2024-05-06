@@ -21,15 +21,16 @@ def control_data_selection(data_path: Path) -> DataHandler:
 
 
 def control_historical_data(data: DataHandler) -> None:
-    is_monthly = view_historical_data.view_title_and_daily_toggle()
-    if data.month_series_minutely is None:
+    is_daily = view_historical_data.view_title_and_daily_toggle()
+    if data.month_series_minutely is None or data.month_series_daily is None:
         st.warning("No data selected yet...")
         return
     selected_devices = view_historical_data.view_device_to_show_selection(
         data.month_series_minutely
     )
     month_usage = get_df_of_historical_data(
-        data.month_series_minutely, selected_devices
+        data.month_series_daily if is_daily else data.month_series_minutely,
+        selected_devices,
     )
     if month_usage is None:
         st.warning("No device selected yet...")
