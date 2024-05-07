@@ -1,6 +1,6 @@
 import calendar
 import datetime
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 import pandas as pd
 from darts import TimeSeries
@@ -54,14 +54,48 @@ def calculate_forecasted_total_usage(
 
 
 def combine_past_and_future_data(
-    future_series: TimeSeries, past_series: TimeSeries, selected_device: str
+    future_series: TimeSeries, past_series: TimeSeries, selected_device: Optional[str]
 ) -> Optional[pd.DataFrame]:
-    future_df = get_df_of_historical_data(future_series, [selected_device], False)
-    if future_df is None:
-        return None
-    future_df["source"] = "Forecast"
-    past_df = get_df_of_historical_data(past_series, [selected_device], False)
+    if selected_device is None:
+        selected_devices = []
+    else:
+        selected_devices = [selected_device]
+    past_df = get_df_of_historical_data(past_series, selected_devices, False)
     if past_df is None:
         return None
+    future_df = get_df_of_historical_data(future_series, selected_devices, False)
+    if future_df is None:
+        return None
     past_df["source"] = "Historical"
+    future_df["source"] = "Forecast"
     return pd.concat([past_df, future_df], axis=0)
+
+
+def generate_daily_data_from_minutely(minutely_data: pd.DataFrame):
+    daily_data = minutely_data.copy()
+    daily_data["Date"] = daily_data["Datetime"].apply(
+        lambda x: x.replace(hour=0, minute=0, second=0, microsecond=0)
+    )
+    all_data = []
+    for _, dev_data in daily_data.groupby("Device", as_index=False):
+        dev_agg = dev_data.groupby("Date", as_index=False).aggregate(
+            {"Power (W)": "sum", "source": "last"}
+        )
+        all_data.append(dev_agg)
+    daily_data = pd.concat(all_data, axis=0)
+    daily_data["Usage (kWh)"] = daily_data["Power (W)"] * 5 / 60 / 1000
+    del daily_data["Power (W)"]
+    last_past_data = daily_data.loc[daily_data["source"] == "Historical", :].iloc[-1, :]
+    last_past_data["source"] = "Forecast"
+    daily_data = pd.concat(
+        [daily_data, last_past_data.to_frame().T], axis=0
+    ).sort_values("Date")
+    return daily_data
+
+
+def calculate_total_forecast_series(
+    daily_data: pd.DataFrame, price_per_kwh: float
+) -> Tuple[float, float]:
+    total_kwh = daily_data["Usage (kWh)"].sum()
+    total_price = total_kwh * price_per_kwh
+    return total_kwh, total_price

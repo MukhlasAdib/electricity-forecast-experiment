@@ -38,10 +38,12 @@ def view_historical_data_selection(series: TimeSeries) -> Tuple[List[str], bool]
 
 def view_usage_of_the_month(monthly_usage: pd.DataFrame, is_daily: bool):
     time_column = "Datetime" if not is_daily else "Date"
+    data_column = "Power (W)" if not is_daily else "Usage (kWh)"
     fig = px.line(
         monthly_usage,
         x=time_column,
-        y="Power (W)" if not is_daily else "Usage (kWh)",
+        y=data_column,
         color="Device",
     )
+    fig.update_layout(yaxis_range=[0, 1.2 * max(monthly_usage[data_column])])
     st.plotly_chart(fig)

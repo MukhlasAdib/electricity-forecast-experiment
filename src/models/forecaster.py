@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -47,11 +48,21 @@ class LGBMForecaster:
         self.model: LightGBMModel = LightGBMModel.load(model_path)  # type: ignore
         self.sampling_minute = sampling_minute
 
-    def predict(self, series: TimeSeries, day_horizon: int):
-        horizon_samples = int(day_horizon * 24 * 60 / self.sampling_minute)
-        if not isinstance(start_time := series.start_time(), pd.Timestamp):
+    def predict(self, series: TimeSeries, target_date: datetime.date):
+        target_datetime = datetime.datetime(
+            year=target_date.year,
+            month=target_date.month,
+            day=target_date.day,
+            hour=23,
+            minute=59,
+        )
+        if not isinstance(end_time := series.end_time(), pd.Timestamp):
             return None
-        start_time.to_pydatetime()
+        forecast_delta = target_datetime - end_time.to_pydatetime()
+        forecast_minutes = (forecast_delta.days * 24 * 60) + (
+            forecast_delta.seconds / 60
+        )
+        horizon_samples = int(forecast_minutes / self.sampling_minute)
         minute_df = (
             series.univariate_component(0)
             .append_values(np.array([0] * horizon_samples))

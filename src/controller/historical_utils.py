@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List, Optional, Tuple
 
 import pandas as pd
@@ -7,30 +8,32 @@ from darts import TimeSeries
 def get_df_of_historical_data(
     series: TimeSeries, selected_devices: List[str], is_daily: bool
 ) -> Optional[pd.DataFrame]:
-    if len(selected_devices) <= 0:
+    device = deepcopy(selected_devices)
+    if len(device) <= 0:
         return None
     var_name = "Usage (kWh)" if is_daily else "Power (W)"
     comp_data_list = []
-    if "All" in selected_devices:
+    if "All" in device:
         comp_data_list.append(
             series.sum(axis=1)
             .pd_dataframe()
             .reset_index()
             .rename(columns={"components_sum": var_name})
         )
-        selected_devices.remove("All")
-        selected_devices = ["All", *selected_devices]
+        device.remove("All")
+        device = ["All", *device]
+
     comp_data_list.extend(
         [
             series.univariate_component(n)
             .pd_dataframe()
             .reset_index()
             .rename(columns={n: var_name})
-            for n in selected_devices
+            for n in device
             if n != "All"
         ]
     )
-    for d, n in zip(comp_data_list, selected_devices):
+    for d, n in zip(comp_data_list, device):
         d.insert(1, column="Device", value=n)
     return pd.concat(comp_data_list, axis=0)
 
