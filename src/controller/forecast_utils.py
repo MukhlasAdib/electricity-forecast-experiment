@@ -9,7 +9,7 @@ from src.controller.historical_utils import (
     get_df_of_historical_data,
     get_total_usage_per_device,
 )
-from src.models.forecaster import AverageForecaster
+from src.data.forecaster import AverageForecaster
 
 
 def get_days_remaining_of_the_month(current_date: datetime.datetime) -> float:

@@ -14,8 +14,8 @@ from src.controller.historical_utils import (
     get_df_of_historical_data,
     get_total_usage_per_device,
 )
-from src.models.data_handler import DataHandler
-from src.models.forecaster import AverageForecaster, LGBMForecaster
+from src.data.data_handler import DataHandler
+from src.data.forecaster import AverageForecaster, LGBMForecaster
 from src.views import (
     view_data_selection,
     view_forecast_data,
