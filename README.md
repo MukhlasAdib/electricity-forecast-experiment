@@ -6,8 +6,11 @@ This repository contains several things:
 
 - Exploratory data analysis (EDA) of a dummy electricity usage dataset and the forecasting model development.
 - Monitoring and forecasting dashboard using [Streamlit](https://streamlit.io/).
+- A sample edge application for ESP32 device.
 
 For details about the EDA and model training of this particular case, please check the respective notebook, `eda_and_training.ipynb`. The notebook also explains about why the specific approach is used and what experiments that I have done.
+
+In `edge/edge_app.ino`, I also provide a sample script to be implemented in ESP32-like device. However, the code is not tested and only to show the code flow.
 
 This documentation is focused on the Streamlit dashboard. Note that the streamlit dashboard can be seen in community cloud: https://mukhlas-electricity-forecast-experiment.streamlit.app/. Please refer [the respective site](https://streamlit.io/cloud) for details about how to deploy Streamlit into the community cloud.
 
