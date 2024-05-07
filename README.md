@@ -61,4 +61,12 @@ The following information is shown in the dashboard
 
 ## Code Structure
 
-TBA
+Here are some brief explanations about how the code is structured. Note that the code structure is inspired by the MVC architecture. 
+
+- `app.py`: the main python entry point
+- `src`: package that contains all modules for `app.py`
+  - `controller`: modules that contain logics that connects the data handler and forecaster (`data` modules) with the UI (`view` modules). These are the only module that is used directly by `app.py`. These 
+  - `data`: modules that handle and contain the data and forecasting model.
+  - `views`: modules that purely handle the UI
+  - `arg_parser.py`: module that handle input argument of `app.py`.
+  - `constants.py`: module that define constants used by all other modules.
