@@ -56,10 +56,8 @@ def control_live_data(data: DataHandler) -> None:
         return
     current_total = data.month_series_minutely[-1].sum(axis=1).values()[0, 0]
     previous_total = data.month_series_minutely[-2].sum(axis=1).values()[0, 0]
-    view_live_data.view_live_total(
-        current_total,
-        previous_total,
-    )
+    current_time = data.month_series_minutely[-1].time_index.to_pydatetime()[0]  # type: ignore
+    view_live_data.view_live_total(current_total, previous_total, current_time)
     latest_data = data.month_series_minutely[-1].pd_dataframe().T.reset_index()
     latest_data.columns = ["Device", "Power (W)"]
     latest_data["Percentage (%)"] = latest_data["Power (W)"].apply(

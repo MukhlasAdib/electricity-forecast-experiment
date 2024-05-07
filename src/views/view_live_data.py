@@ -1,16 +1,23 @@
+import datetime
+
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
 
-def view_live_total(current_total: float, previous_total: float) -> None:
+def view_live_total(
+    current_total: float, previous_total: float, current_date: datetime.datetime
+) -> None:
+    datetime_str = current_date.strftime("%d/%m/%Y %H:%M:%S")
+    title = "<span style='font-size:1.7em'>Current Usage</span>"
+    title += f"<br><br><span style='font-size:1.7em'>{datetime_str}</span>"
     fig = go.Figure()
     fig.add_trace(
         go.Indicator(
             mode="number+delta",
             value=current_total,
-            title="<span style='font-size:1.7em'>Current Usage</span>",
+            title=title,
             number={"suffix": " W", "font.size": 40},
             delta={"reference": previous_total, "suffix": " W"},
         )
