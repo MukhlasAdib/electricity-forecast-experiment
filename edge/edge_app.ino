@@ -3,7 +3,9 @@
 #include <TaskScheduler.h>
 
 void startWifiConnection();
-void unggahData();
+void uploadData();
+String formatHttpRequest(String body, String host);
+String getNewData(String deviceId);
 
 char* ssid = "YourWifiSSID";
 char* password = "YourWifiPassword";
