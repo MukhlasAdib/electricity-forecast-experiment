@@ -91,9 +91,9 @@ String getNewData(String deviceId){
   int newTimestamp = getCurrentTimestamp(); // Unimplemented
 
   // Format data to JSON
-  String postData = "{\"Device ID\":\"" + deviceId;
+  String postData = "{\"Device ID\":\"" + deviceId + \";
   postData += "\", \"Voltage (V)\":" + String(newVoltage);
   postData += ", \"Ampere (A)\":" + String(newAmpere);
-  postData += ", \"Timestamp\":" + String(newTimestamp) + "}";
+  postData += ", \"Timestamp\":\"" + String(newTimestamp) + "\"}";
   return postData;
 }
